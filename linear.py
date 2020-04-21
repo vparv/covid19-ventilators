@@ -12,11 +12,17 @@ import json
 getcontext().prec = 3
 cases = 17615
 #ventilator = 10000
-ventilators = input ("Enter number of ventilators: ")
+ventilators = 0
+used = .14 * cases - .05 * cases
+while (int(ventilators) < used):
+    ventilators = input ("Enter number of ventilators: ")
+    if (int(ventilators) < used):
+        print ("Please enter a number greater than " + str(round(used)) + " for the number of ventilators")
+
 #ventilators = "10000"
 ventilator = int(ventilators)
 
-used = .14 * cases - .05 * cases
+
 ventilator = ventilator - used
 
 import requests
@@ -32,32 +38,19 @@ headers = {
 
 response = requests.request("GET", url, headers=headers, params=querystring)
 
-#print(response.text)
-
 data = response.json()
 
 newcases = data['latest_stat_by_country'][0]['active_cases']
-#print (type(newcases))
-cases = int(newcases.replace(',',''))
-#print (type(cases))
-#print (cases)
 
-#print(response['latest_stat_by_country']['active_cases'])
-#print (newcases)
+cases = int(newcases.replace(',',''))
 
 print ("Given that 14% of cases are severe and 5% of cases are critical, we will allocate ventilators to those patients first. This takes away a total of " + str(round(used)) + " ventilators")
 
 print ("There are " + str(cases) + " cases and only " + str(int(ventilator)) + " ventilators")
-#print (cases)
-#print ("and only")
-#print (ventilator)
-#print ("ventilators.")
 
 # directory the data is saved
 in_dir = '/Users/Vineet/Documents/Linear/covid19-ventilators'
 
-# load data
-#age_data = pd.read_csv(os.path.join(in_dir, 'PercentIndia.csv'))
 
 age_groups = [0,10,20,30,40,50,60,70,80]
 percents = [.0364, .0806, .2040, .2366, .1669, .1439, .0959, .0301, 0.004, 0.001]
@@ -69,41 +62,25 @@ arrrate = [.01, .06, .08, .12, .16, .2, .25, .06, .06]
 num_cases = [0,0,0,0,0,0,0,0,0,0]
 years = np.array([0,0,0,0,0,0,0,0,0])
 ventilator_usage = [0,0,0,0,0,0,0,0,0]
-# Convert the impt data into dicts with keys as the day number, age-brackets & days of use of ventilator
-#age_brackets = age_data['Group'].toList()
+
 x = 0
+# Number Cases per Age Bracket
 for i in percents:
     num_cases[x] = cases * i
     num_cases[x] = round(num_cases[x])
-    #print (num_aff[x])
     x = x + 1
-#print (num_cases)
-#print ("Life Expenctancies:")
+
+
+# Life Expenctancies per Age Bracket
 x = 0
 for i in age_groups:
     expectancy = 68.7 - i - 5.5;
     if expectancy >= 0:
         life[x] = expectancy
         life[x] = round(life[x],1)
-   # print (life[x])
     x = x + 1
 
-#print (round(life[6],1))
-#x = 0    
-#print ("Number of cases:")
-
-'''
-sumnum = 0
-for i in arrrate:
-    num_cases[x] = i * cases;
-    sumnum  = sumnum + num_cases[x]
-    #print (num_cases[x])
-    x = x + 1
-print(num_cases)
-'''
-
-
-# print (sumnum)
+# print patients in each age bracket
 print ("Patients in each age group")
 print ("O - 10 years: " + str(round(num_cases[0])) + " patients")
 print ("11 - 20 years: " + str(round(num_cases[1])) + " patients")
@@ -115,13 +92,6 @@ print ("61 - 70 years: " + str(round(num_cases[6])) + " patients")
 print ("71 - 80 years: " + str(round(num_cases[7])) + " patients")
 print ("81 - 90 years: " + str(round(num_cases[8])) + " patients")
 
-'''
-x = 0
-for i in num_cases:
-    years[x] = i * life[x] * survWvent[x]
-    #print (years[x])
-    x = x + 1
-'''
 x = 0
 
 seed(1)
@@ -159,26 +129,11 @@ print ("51 - 60 years: " + str(round(ventilator_usage[5])) + " patients")
 print ("61 - 70 years: " + str(round(ventilator_usage[6])) + " patients")
 print ("71 - 80 years: " + str(round(ventilator_usage[7])) + " patients")
 print ("81 - 90 years: " + str(round(ventilator_usage[8])) + " patients")
-# print(x)
+
 totalyears = survWvent[0] * round(life[0],1) * ventilator_usage[0] + survWO[0]*round(life[0],1)*(num_cases[0]-ventilator_usage[0]) + survWvent[1]*round(life[1],1) * ventilator_usage[1] + survWO[1]*round(life[1],1)*(num_cases[1]-ventilator_usage[1]) + survWvent[2]*round(life[2],1) * ventilator_usage[2] + survWO[2]*round(life[2],1)*(num_cases[2]-ventilator_usage[2]) + survWvent[3]*round(life[3],1) * ventilator_usage[3] + survWO[3]*round(life[3],1)*(num_cases[3]-ventilator_usage[3]) + survWvent[4]*round(life[4],1) * ventilator_usage[4] + survWO[4]*round(life[4],1)*(num_cases[4]-ventilator_usage[4]) + survWvent[5]*round(life[5],1) * ventilator_usage[5] + survWO[5]*round(life[5],1)*(num_cases[5]-ventilator_usage[5]) + survWvent[6]*round(life[6],1) * ventilator_usage[6] + survWO[6]*round(life[6],1)*(num_cases[6]-ventilator_usage[6]) + .16 * ventilator_usage[7] + .08*(num_cases[7]-ventilator_usage[7])  + .16 * ventilator_usage[8] + .08*(num_cases[8]-ventilator_usage[8])     
-#totalyears = .77*62.2 * ventilator_usage[0] + .4*62.2*(num_cases[0]-ventilator_usage[0]) + .73*52.2 * ventilator_usage[1] + .35*52.2*(num_cases[1]-ventilator_usage[1]) + .67*42.2 * ventilator_usage[2] + .35*42.2*(num_cases[2]-ventilator_usage[2]) + .63*32.2 * ventilator_usage[3] + .3*32.2*(num_cases[3]-ventilator_usage[3]) + .58*22.2 * ventilator_usage[4] + .25*22.2*(num_cases[4]-ventilator_usage[4]) + .23*12.2 * ventilator_usage[5] + .12*12.2*(num_cases[5]-ventilator_usage[5]) + .21*2.2 * ventilator_usage[6] + .15*2.2*(num_cases[6]-ventilator_usage[6]) + .16 * ventilator_usage[7] + .08*(num_cases[7]-ventilator_usage[7])  + .16 * ventilator_usage[8] + .08*(num_cases[8]-ventilator_usage[8])     
 print ("Current life years expected upon random selection of patients using a normal distribution to emulate 'first come first serve' policy: " + str(round(totalyears)))
 
-# print (ventilator_usage)  
-#print (sum(ventilator_usage))  
 
-# print ("Total years:")
-#totalyears = sum(years)
-'''
-for i in range(9):
-    totalyears = totalyears + years[i]
-   # print (totalyears)
-    
-print ("Total years")
-print (totalyears)
-        '''
-#expectedtotalyears = 17615 * .01 * 62.2 + 17615 * 0.06 * 52.2 + 17616 * 0.08 * 42.2 + 17615 * .12 + 17615 * .16 * 32.2 + 17615 * .2 * 22.2 + 17615 * .25 * 12.2 + 17615 * .12 * 2.2
-#print (expectedtotalyears)
 
 
 model = pulp.LpProblem("Life year maximizing problem", pulp.LpMaximize)
@@ -235,16 +190,16 @@ print ("81 - 90 years: " + str(I.varValue) + " patients")
 
 
 
-#print "Production of Car B = {}".format(B.varValue)
+
 
 # Print our objective function value
-#print pulp.value(model.objective)
+
 
 print ("Total life years through optimization of ventilator usage: " + str(round(pulp.value(model.objective))))
 
 
 difference = int(round(pulp.value(model.objective))) - totalyears
 print ("By optimizing ventilator usage, we were able to increase expected life years by " + str(round(difference)))
-#print(age_data['Percent'][1])
+
 
 
