@@ -49,7 +49,7 @@ print ("Given that 14% of cases are severe and 5% of cases are critical, we will
 print ("There are " + str(cases) + " cases and only " + str(int(ventilator)) + " ventilators")
 
 # directory the data is saved
-in_dir = '/Users/Vineet/Documents/Linear/covid19-ventilators'
+#in_dir = '/Users/Vineet/Documents/Linear/covid19-ventilators'
 
 
 age_groups = [0,10,20,30,40,50,60,70,80]
